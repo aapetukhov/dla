@@ -6,13 +6,15 @@ As always, your code **must** be based on the provided [Project Template](https:
 
 Implement and train a neural-network speech recognition system with a CTC loss.
 
+**You cannot use implementations available on the internet.**
+
 ---
 
 ### Mandatory requirements
 
 We **do not** accept the homework if any of the following requirements are not satisfied:
 
-- The code should be stored in a public github (or gitlab) repository and based on the provided template.
+- The code should be stored in a public github (or gitlab) repository and based on the provided template. (Before the deadline, use a private repo. Make it public after the deadline.)
 - All the necessary packages should be mentioned in `./requirements.txt` or be installed in a dockerfile.
 - All necessary resources (such as model checkpoints, LMs, and logs) should be downloadable with a script. Mention the script (or lines of code) in the `README.md`.
 - You should implement all functions in `inference.py` (for evaluation) so that we can check your assignment (see [Testing](#testing) section).
@@ -28,6 +30,74 @@ We **do not** accept the homework if any of the following requirements are not s
   - What were the major challenges?
 
   Also attach a summary of all bonus tasks you have implemented.
+
+> [!NOTE]
+> Currently, Comet ML does not support audio panels in their Reports. To show your audio logs, use Python Panel. Code for the Python Panel is shown below (carefully look at the normalization for plotting and check if it works for your audio):
+
+<details>
+
+<summary>Audio Panel Code (as Python Comet ML Panel)</summary>
+
+```python
+# Comet Python Panels BETA, full documentation available at:
+# https://www.comet.com/docs/v2/guides/comet-ui/experiment-management/visualizations/python-panel/
+
+# By Petr Grinberg @ https://github.com/markovka17/dla 2024
+
+from comet_ml import API, ui
+from scipy.io.wavfile import read
+import matplotlib.pyplot as plt
+import os
+import numpy as np
+import streamlit as st
+
+
+# Get available metrics
+api = API()
+metrics = api.get_panel_metrics_names()
+
+exps = api.get_panel_experiments()
+all_possible_steps = []
+for exp in exps:
+    assets = exp.get_asset_list()
+    for asset in assets:
+        if asset["type"] == "audio":
+            step = asset["step"]
+            all_possible_steps.append(step)
+all_possible_steps = sorted(set(all_possible_steps))
+
+step_option = st.selectbox(
+    "Choose a step",
+    all_possible_steps,
+)
+
+for exp in exps:
+    exp_name = exp.name
+    assets = exp.get_asset_list()
+    for asset in assets:
+        if asset["type"] == "audio":
+            curl_command = asset["curlDownload"]
+            filename = asset["fileName"]
+            step = asset["step"]
+            if step != step_option:
+                continue
+            os.system(curl_command)
+            sr, wav_array = read(curl_command.split()[-1])
+            print(f"Exp: {exp_name}, Step: {step}, Name: {filename}")
+            wav_dtype = wav_array.dtype
+            max_amplitude = np.iinfo(np.int16).max
+            wav_array = wav_array / max_amplitude
+            # Visualize the data
+            figure, ax = plt.subplots()
+            wav_time = np.arange(wav_array.shape[0]) / sr
+            ax.plot(wav_time, wav_array)
+            ax.set_xlabel("Time (s)")
+            ax.grid()
+            st.pyplot(figure)
+            st.audio(wav_array, format="audio/wav", sample_rate=sr, loop=False)
+```
+
+</details>
 
 ---
 
@@ -56,6 +126,9 @@ We also require that you fulfill the following requirements. Not fulfilling them
     2. Log audio / spectrograms in each of your experiments showing that your augmentations are not too severe (otherwise, it is not possible to predict correct text on your input data).
 - (Up to `-2.0 points` if missing) Implement a simple hand-crafted beam search for the evaluation. You must provide a run showing that your beam search works (improves score in comparison to argmax version).
 - (Up to `-1.0 points` if missing) Implement at least 4 types of audio augmentations that are relevant for the ASR task
+
+> [!NOTE]
+> One of the homework goals is to get practice in proper project development. Thus, we will look at your Git history, `README`, `requirements.txt`, etc. Provide a comprehensive README, do not indicate packages that are not actually needed in the `requirements`, write meaningful commit names, etc. Do not hesitate to use `pre-commit` for code formatting.
 
 ---
 
@@ -137,7 +210,7 @@ Recommended architectures:
 
 - [DeepSpeech2](http://proceedings.mlr.press/v48/amodei16.pdf)
 - [QuartzNet](https://arxiv.org/abs/1910.10261). Note: it is difficult to train without a large batch size and nice GPU.
-- [Jasper](https://arxiv.org/pdf/1904.03288.pdf)
+- [Jasper](https://arxiv.org/pdf/1904.03288.pdf). Note: it is difficult to train without a large batch size and nice GPU.
 - [Conformer](https://arxiv.org/abs/2005.08100)
 
 Training a good NN model is a challenging task that is extremely difficult to debug. We recommend you to follow these steps:
@@ -164,7 +237,6 @@ Links:
 
 - [Mozilla Common Voice (en)](https://commonvoice.mozilla.org/ru)
 - [LibriSpeech](https://www.openslr.org/12)
-- [LJ Speech](https://keithito.com/LJ-Speech-Dataset/)
 
 To save some coding time, it is recommended to use [HuggingFace dataset library](https://github.com/huggingface/datasets). Look how easy it is:
 
