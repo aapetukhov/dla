@@ -1,16 +1,17 @@
 # Week 03
 
 - [Lecture slides](https://docs.google.com/presentation/d/1cBXdNIbowwYNp42WhJmd1Pp85oeslOrKNmGyZa5HKBQ/edit?usp=sharing)
-- [Recording on YouTube (in Russian)](TBA)
-- [Recording on Yandex Disk (in Russian)](https://disk.yandex.ru/d/pTZCia6Bq4AeOg/Лекция%2BСеминар%202024-09-19T08-06-52Z.mp4)
+- [Recording on YouTube (in Russian)](https://youtu.be/6xLgfM9ixY4?si=W1B0iXIGYAUVeUIw)
 
 ### Practice & homework
 
 - **Seminar:**
-  - Augmentations: `./seminar03_1.ipynb`
-  - CTC Decoding, WER, CER, CTC Beam Search: `./seminar03_2.ipynb`
+
+  - Augmentations: [Notebook](./seminar03_1.ipynb)
+  - CTC Decoding, WER, CER, CTC Beam Search: [Notebook](./seminar03_2.ipynb)
 
 - **Q&A Session:**
+
   - [Project Template](https://github.com/Blinorot/pytorch_project_template)
   - [Notebook about R&D Coding](Seminar_RandD_Coding.ipynb)
   - [Examples from the notebook](./notebook_problems_examples/)
